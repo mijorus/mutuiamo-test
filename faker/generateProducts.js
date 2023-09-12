@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import {faker} from "@faker-js/faker";
-import * as db from "../db.js";
-import { Bank } from "../models/Bank.js";
-import { Product } from '../models/Product.js';
+import * as db from "../src/db.js";
+import { Bank } from "../src/models/Bank.js";
+import { Product } from '../src/models/Product.js';
 
 async function main() {
+    await db.testConnection();
     const banks = await Bank.findAll();
     for (let i = 0; i < 40; i++) {
         await Product.create({

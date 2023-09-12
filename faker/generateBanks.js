@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import * as db from "../db.js";
-import { Bank } from "../models/Bank.js";
+import * as db from "../src/db.js";
+import { Bank } from "../src/models/Bank.js";
 
 async function main() {
     await db.testConnection();
