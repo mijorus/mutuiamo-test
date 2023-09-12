@@ -15,12 +15,16 @@ async function main() {
         'name': 'Credit Agricole',
         'email': null,
         'use_email_for_prospects': false,
+        "requires_subsidiary_code": true,
+        'webhook': 'https://receive-prospects.ca.it'
     });
 
     await Bank.create({
         'name': 'Sanpaolo',
         'email': null,
         'use_email_for_prospects': false,
+        "requires_subsidiary_code": true,
+        'webhook': 'https://receive-prospects.sanpaolo.it'
     });
 }
 

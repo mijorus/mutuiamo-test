@@ -17,5 +17,13 @@ export const Bank = sqlz.define('Bank', {
     },
     use_email_for_prospects: {
         type: DataTypes.BOOLEAN,
+    },
+    requires_subsidiary_code: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    webhook: {
+        type: DataTypes.TEXT,
+        defaultValue: null
     }
 }, { sequelize: sqlz, tableName: 'banks' });

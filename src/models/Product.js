@@ -4,10 +4,9 @@ import { Bank } from './Bank.js';
 
 export const Product = sqlz.define('Product', {
     id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
         primaryKey: true,
-        allowNull: false,
     },
     name: {
         type: DataTypes.TEXT,
