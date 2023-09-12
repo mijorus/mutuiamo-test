@@ -4,29 +4,29 @@ import { User } from "../../models/User.js";
 export const router = Router();
 
 router.param('user', async function (req, res, next, userId) {
-    let u = undefined;
+    let data = undefined;
 
     try {
-        u = await User.findOne({ where: { id: userId } });
+        data = await User.findOne({ where: { id: userId } });
     } catch (e) {
         console.warn(e);
     }
 
-    if (!u) {
+    if (!data) {
         return res.status(404).json({ message: 'User not found!' });
     }
 
-    req.user = u;
+    req.user = data;
     return next();
 });
 
 router.get('/:user', function (req, res) {
-    res.json({ user: req.user });
+    res.json({ data: req.user });
 });
 
 router.get('/', async function (req, res) {
     const users = await User.findAll();
-    return res.json(users);
+    return res.json({ data: users });
 });
 
 router.post('/', async function (req, res) {
@@ -38,7 +38,7 @@ router.post('/', async function (req, res) {
 
     try {
         const u = await User.build(req.body).save();
-        return res.json({ id: u.id });
+        return res.status(201).json({ id: u.id });
     } catch (e) {
         console.error(e);
         return res.status(500).json({

@@ -3,8 +3,49 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 import { Bank } from './Bank.js';
 import { User } from './User.js';
 import { Product } from './Product.js';
+import { Request } from "express";
 
-export const Prospect = sqlz.define('Prospect', {
+export class CreateProspectError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "CreateProspectError";
+    }
+}
+
+export class Prospect extends Model {
+    /**
+     * 
+     * @param {Request} req
+     * @returns {Prospect}
+     */
+    static async createProspectFromRequest(req) {
+        const requestItems = {
+            bank: await Bank.findOne({ where: { id: req.bank_id } }),
+            user: await User.findOne({ where: { id: req.user_id } }),
+            product: await Product.findOne({ where: { id: req.product_id } })
+        };
+
+        for (let key in requestItems) {
+            if (!key) throw new CreateProspectError('Invalid ' + key);
+        }
+
+        const { tan, taeg, subsidiary_code, instalment } = req.body;
+        const el = await Prospect.create({
+            tan,
+            taeg,
+            subsidiary_code,
+            instalment,
+            status: false,
+            bank_id: bank.id,
+            product: product.id,
+            user: user.id
+        });
+
+        return el;
+    }
+}
+
+Prospect.init({
     id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
