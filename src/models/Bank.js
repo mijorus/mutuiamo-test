@@ -12,7 +12,8 @@ export const Bank = sqlz.define('Bank', {
         type: DataTypes.TEXT,
     },
     email: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        unique: true
     },
     use_email_for_prospects: {
         type: DataTypes.BOOLEAN,
