@@ -14,7 +14,8 @@ export const User = sqlz.define('User', {
     },
     cf: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
+        unique: true,
     },
     finacial_data: {
         type: DataTypes.JSON,
