@@ -29,18 +29,17 @@ export class Prospect extends Model {
         const requiredFields = [
             "tan",
             "taeg",
-            "subsidiary_code",
             "instalment",
             "bank_id",
             "product_id",
             "user_id",
         ];
 
-        for (let f in requiredFields) {
+        requiredFields.forEach(f => {
             if (Object.keys(req.body).includes(f)) {
                 throw new CreateProspectError('Missing required field: ' + f);
             }
-        }
+        })
 
         const items = {
             bank: await Bank.findOne({ where: { id: req.body.bank_id } }),
@@ -54,15 +53,11 @@ export class Prospect extends Model {
 
         const { tan, taeg, subsidiary_code, instalment } = req.body;
 
-        console.log(items.bank.dataValues.requires_subsidiary_code);
-
-        if (items.bank.dataValues.requires_subsidiary_code &&
-            !subsidiary_code
-        ) {
+        if (items.bank.dataValues.requires_subsidiary_code && !subsidiary_code) {
             throw new CreateProspectError('Bank ' + items.bank.dataValues.name + ' requires subsidiary_code');
         }
 
-        const el = await Prospect.create({
+        const prospect = await Prospect.create({
             tan,
             taeg,
             subsidiary_code,
@@ -73,23 +68,35 @@ export class Prospect extends Model {
             user_id: items.user.id
         });
 
-        return el;
+        return prospect;
     }
 
     async send() {
         const bank = await this.getBank();
+        
+        if (!bank) {
+            throw new Error('Invalid bank for this prospect!');
+        }
 
         if (bank.use_email_for_prospects) {
             // send EMAIL
             console.log('Sending email to ' + bank.email);
+            return;
         } else {
-            // POST request to the API of the bank
-            if (!this.status) {
-                console.log('Sending prospect to ' + bank.webhook);
-                await this.update({'status': 1});
-            } else {
+            if (this.status) {
                 console.log('Prospect already send!');
                 throw new AlreadySentError();
+            }
+            
+            console.log('Sending prospect to ' + bank.webhook);
+
+            try {
+                // POST request to the API of the bank
+                await this.update({'status': 1});
+            } catch (e) {
+                // Error handling logic
+                console.warn(e);
+                throw new Error('Cannot contact the Bank');
             }
         }
     }
