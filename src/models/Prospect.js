@@ -36,25 +36,23 @@ export class Prospect extends Model {
         ];
 
         requiredFields.forEach(f => {
-            if (Object.keys(req.body).includes(f)) {
+            if (!Object.keys(req.body).includes(f)) {
                 throw new CreateProspectError('Missing required field: ' + f);
             }
         })
 
-        const items = {
-            bank: await Bank.findOne({ where: { id: req.body.bank_id } }),
-            user: await User.findOne({ where: { id: req.body.user_id } }),
-            product: await Product.findOne({ where: { id: req.body.product_id } }),
-        };
+        const bank = (await Bank.findOne({ where: { id: req.body.bank_id } }));
+        const user = (await User.findOne({ where: { id: req.body.user_id } }));
+        const product = (await Product.findOne({ where: { id: req.body.product_id } }));
 
-        for (let k in items) {
-            if (!items[k]) throw new CreateProspectError('Invalid ' + k);
+        for (let k of [bank, user, product]) {
+            if (!k) throw new CreateProspectError('Invalid ' + k);
         }
 
         const { tan, taeg, subsidiary_code, instalment } = req.body;
 
-        if (items.bank.dataValues.requires_subsidiary_code && !subsidiary_code) {
-            throw new CreateProspectError('Bank ' + items.bank.dataValues.name + ' requires subsidiary_code');
+        if (bank.dataValues.requires_subsidiary_code && !subsidiary_code) {
+            throw new CreateProspectError('Bank ' + bank.dataValues.name + ' requires subsidiary_code');
         }
 
         const prospect = await Prospect.create({
@@ -63,9 +61,9 @@ export class Prospect extends Model {
             subsidiary_code,
             instalment,
             status: false,
-            bank_id: items.bank.id,
-            product_id: items.product.id,
-            user_id: items.user.id
+            bank_id: bank.id,
+            product_id: product.id,
+            user_id: user.id
         });
 
         return prospect;
