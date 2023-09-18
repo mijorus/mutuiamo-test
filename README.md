@@ -72,4 +72,10 @@ curl --location --request POST 'http://localhost:3000/prospects/:prospect_id/sen
 
 ```
 
+## Test
 
+Run the following command to execute tests with Jest: 
+
+```
+npm run test
+```
